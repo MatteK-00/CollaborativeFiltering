@@ -21,6 +21,7 @@ import re
 import time
 from random import randrange, uniform
 import heapq
+from sets import Set
 from datetime import datetime
 import calendar
 
@@ -43,10 +44,10 @@ def __AverageL__(Matrix):
     return AverageList
 
 
-def __simil__(Matrix,PATH,Written=False):
+def __simil__(Matrix,PATH,Y,Written=False):
     #The Pearson correlation similarity
     AverageList = __AverageL__(Matrix)
-    SimilMatrix = [[0 for x in range(943)] for y in range(943)]
+    SimilMatrix = [[0 for x in range(Y)] for y in range(Y)]
     if Written:
         with open(PATH+'SimilMatrix','r') as SM:
             counterLine = 0
@@ -122,8 +123,8 @@ def __randomSampleOrd__(test,path,PATH):
                         wr2.writerow(line)
 
 
-def __getData__(test,path,PATH,timeStampOrd=False,SaveToDisk=True):
-    Matrix = [[0 for x in range(1682)] for y in range(943)]
+def __getData__(test,path,PATH,X,Y,timeStampOrd=False,SaveToDisk=True):
+    Matrix = [[0 for x in range(X)] for y in range(Y)]
     if timeStampOrd:
         if SaveToDisk:
             __timeStampOrd__(test,path,PATH)
@@ -193,8 +194,109 @@ def __UserRatingPrediction__(k,PATH,Matrix,SimilMatrix):
     URP.close()
     testLine.close()
 
-
     return res
+
+def __ReferenceRankig__(Matrix):
+    RefRank = []
+    for i in range (0,len(Matrix[0])):
+        counter = 0
+        temp = 0.0
+        for j in range (0,len(Matrix)):
+            if Matrix[j][i] != 0:
+                temp += Matrix[j][i]
+                counter += 1
+        if counter != 0:
+            #TODO: ora utilizza la parte intera di temp, implementare un'approssimazione
+            RefRank.append([int(temp/counter),counter,i])
+        else:
+            print 'WARNING no rankings for item '+ str(i)
+
+
+    RefRank.sort()
+    RefRank.reverse()
+    return RefRank
+
+
+def __UsagePrediction__ (K,PATH,Matrix,SimilMatrix):
+    res = []
+    usersToTest = []
+    itemsForUser = []
+    with open(PATH+'dataTest','r') as testLine:
+        for line in csv.reader(testLine, dialect="excel"):
+            if int(line[0])-1 not in usersToTest:
+                usersToTest.append(int(line[0])-1)
+                itemsForUser.append((int(line[0])-1,[int(line[1])-1]))
+            else:
+                for i in itemsForUser:
+                    if i[0] == int(line[0])-1:
+                        i[1].append(int(line[1])-1)
+
+    testLine.close()
+    with open (PATH+'UsagePrediction','w') as URP:
+        wr1 = csv.writer(URP, dialect='excel')
+        for usr_u in usersToTest:
+            users_v = []
+            for i in range(0,len(SimilMatrix)):
+                if SimilMatrix[usr_u][i] != 0:
+                    users_v.append([SimilMatrix[usr_u][i],i])
+            k2 = min(K,len(users_v))
+            users_simil = heapq.nlargest(k2,users_v)
+            filmToRank = []
+            for u in range(0,len(users_simil)):
+                for j in range(0,len(Matrix[0])):
+                    if (Matrix[users_simil[u][1]][j] !=0):
+                        #filmToRank.append((i,Matrix[u][j]))
+                        filmToRank.append((j))
+            HASH = Set(filmToRank)
+            temprank = []
+            for i in HASH:
+                temprank.append((filmToRank.count(i),i))
+            temprank2 = heapq.nlargest(k2,temprank)
+
+            rank = []
+            for i in temprank2:
+                rank.append(i[1])
+
+
+
+            TP = FN = FP = TN = 0
+            temp = []
+            for k in itemsForUser:
+                if k[0] == usr_u:
+                    temp = k[1]
+                    for i in k[1]:
+                        if i in rank:
+                            TP += 1
+                        else:
+                            FN += 1
+                    for j in rank:
+                        if j in k[1]:
+                            FP += 1
+                        else:
+                            TN += 1
+
+
+            resP = [TP,FN,FP,TN]
+            res.append(resP)
+            wr1.writerow([usr_u,'TP = '+str(TP) +' FN = '+str(FN)+' FP = '+str(FP)+' TN = '+str(TN),temp, rank]) #, Precision,Recall.FalsePositiveRate)
+
+        tp = fn = fp = tn = 0
+        for i in res:
+            tp += i[0]
+            fn += i[1]
+            fp += i[2]
+            tn += i[3]
+
+        Precision = (float(tp))/tp+fp
+        Recall = float(tp)/tp+fn
+        FalsePositiveRate = float(fp)/fp+tn
+
+        wr1.writerow('Precision = ' +str(Precision) +' Recall = ' + str(Recall) +' FalsePositiveRate = ' + str(FalsePositiveRate))
+
+
+    return 'Precision = ' +str(Precision) +' Recall = ' + str(Recall) +' FalsePositiveRate = ' + str(FalsePositiveRate)
+
+
 
 
 def __RMSE_MAE__(PATH):
@@ -218,8 +320,16 @@ def __RMSE_MAE__(PATH):
 
 
 
-def main(nome,test,nTest=None,note='',dataset='MovieLens',path='/home/matteo/Desktop/DataMining/ml-100k/'):
+def main(nome,test,nTest=None,note='',dataset='MovieLens',path='/home/matteo/Desktop/DataMining/ml-100k/',X=0,Y=0):
 
+    if dataset == 'MovieLens':
+        path='/home/matteo/Desktop/DataMining/ml-100k/'
+        X=1682
+        Y=943
+    elif dataset == 'yelp':
+        path='/home/matteo/Desktop/DataMining/yelp_dataset_academic/'
+        X=13490
+        Y=130873
 
     #Matrix = [[0 for x in range(1682)] for y in range(943)]
     #AverageList = []
@@ -231,15 +341,16 @@ def main(nome,test,nTest=None,note='',dataset='MovieLens',path='/home/matteo/Des
 
 
 
-    Matrix = __getData__(test, path, PATH, False,False)
+    Matrix = __getData__(test, path, PATH,X,Y, False,)
+    #print __ReferenceRankig__(Matrix)
 
+    SimilMatrix = __simil__(Matrix,PATH,Y,True)
+    print __UsagePrediction__(15,PATH,Matrix,SimilMatrix)
 
-    SimilMatrix = __simil__(Matrix,PATH,True)
+    #res = __UserRatingPrediction__(6,PATH,Matrix,SimilMatrix)
 
-
-    res = __UserRatingPrediction__(6,PATH,Matrix,SimilMatrix)
-
-    __RMSE_MAE__(PATH)
+    #TODO: aggiungere nei log le misurazioni!
+    #__RMSE_MAE__(PATH)
 
     #print res
 
@@ -275,8 +386,8 @@ def main(nome,test,nTest=None,note='',dataset='MovieLens',path='/home/matteo/Des
 
 
 if __name__ == "__main__":
-    #main('test',10,4,'Test completo creazione dati (randomSample) tabelle e calcolo errore predizione')
-    main('Test',10,7,'Test completo creazione dati (randomSample) tabelle e calcolo errore predizione')
+    main('Test',10,8,'Test completo creazione dati (randomSample) tabelle e calcolo errore predizione')
+    #main('Test_YELP',10,8,'Test completo creazione dati (randomSample) tabelle e calcolo errore predizione','yelp')
 
 
 # class User:

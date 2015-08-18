@@ -49,48 +49,48 @@ import io, json, csv, datetime
 #         w2.close()
 #     f.close()
 
-
-list_u = []
-list_b = []
-list_d = []
-with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/u.user', 'r') as r1:
-    for line in csv.reader(r1, dialect="excel"):
-        list_u.append(line)
-r1.close()
-with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/u.business', 'r') as r2:
-    for line in csv.reader(r2, dialect="excel"):
-        list_b.append(line)
-r2.close()
-
-with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/tmpNFvucrParsed.json', 'r') as f:
-    for line in f:
-        list_d.append(line)
-f.close()
-with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/u.data', 'w') as w3:
-    wr3 = csv.writer(w3, dialect='excel')
-    for line in list_d:
-        review = []
-        data = json.loads(line)
-        if data['type'] == 'review':
-            for l1 in list_u:
-                if data['user_id'] in l1:
-                    review.append(l1[0])
-                    break
-            for l2 in list_b:
-                if data['business_id'] in l2:
-                    review.append(l2[0])
-                    break
-            if len(review) != 2:
-                print 'WARNING review len < 2'
-            else:
-                review.append(data['stars'])
-                review.append(datetime.datetime(int(data['date'][0:4]), int(data['date'][5:7]),int(data['date'][8:10])).strftime('%s'))
-                review.append(data['review_id'])
-                review.append(data['funny'])
-                review.append(data['useful'])
-                review.append(data['cool'])
-                wr3.writerow(review)
-
-
-
-
+#
+# list_u = []
+# list_b = []
+# list_d = []
+# with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/u.user', 'r') as r1:
+#     for line in csv.reader(r1, dialect="excel"):
+#         list_u.append(line)
+# r1.close()
+# with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/u.business', 'r') as r2:
+#     for line in csv.reader(r2, dialect="excel"):
+#         list_b.append(line)
+# r2.close()
+#
+# with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/tmpNFvucrParsed.json', 'r') as f:
+#     for line in f:
+#         list_d.append(line)
+# f.close()
+# with open('/home/matteo/Desktop/DataMining/yelp_dataset_academic/u.data', 'w') as w3:
+#     wr3 = csv.writer(w3, dialect='excel')
+#     for line in list_d:
+#         review = []
+#         data = json.loads(line)
+#         if data['type'] == 'review':
+#             for l1 in list_u:
+#                 if data['user_id'] in l1:
+#                     review.append(l1[0])
+#                     break
+#             for l2 in list_b:
+#                 if data['business_id'] in l2:
+#                     review.append(l2[0])
+#                     break
+#             if len(review) != 2:
+#                 print 'WARNING review len < 2'
+#             else:
+#                 review.append(data['stars'])
+#                 review.append(datetime.datetime(int(data['date'][0:4]), int(data['date'][5:7]),int(data['date'][8:10])).strftime('%s'))
+#                 review.append(data['review_id'])
+#                 review.append(data['funny'])
+#                 review.append(data['useful'])
+#                 review.append(data['cool'])
+#                 wr3.writerow(review)
+#
+#
+#
+#
