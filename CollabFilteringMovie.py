@@ -287,9 +287,14 @@ def __UsagePrediction__ (K,PATH,Matrix,SimilMatrix):
             fp += i[2]
             tn += i[3]
 
-        Precision = (float(tp))/tp+fp
-        Recall = float(tp)/tp+fn
-        FalsePositiveRate = float(fp)/fp+tn
+        print 'TP =' +str(tp)
+        print 'FN ='+ str(fn)
+        print 'FP ='+ str(fp)
+        print 'TN ='+ str(tn)
+
+        Precision = (float(tp))/(tp+fp)
+        Recall = (float(tp))/(tp+fn)
+        FalsePositiveRate = (float(fp))/(fp+tn)
 
         wr1.writerow('Precision = ' +str(Precision) +' Recall = ' + str(Recall) +' FalsePositiveRate = ' + str(FalsePositiveRate))
 
