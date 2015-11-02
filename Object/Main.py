@@ -1,12 +1,8 @@
-import csv
-from GestioneInput import __initData, __getData__, __similUxU__, __addNote
-from Similarity import __simil_UxU_Obj__, __simil_UxU_ObjFull__, __recSystemObjUxU__
-import ast
+from GestioneInput import __initData
+from ObjectItem import __getMatrixCF_ITEM__
+from SimilarityIxI import __simil_IxI_ObjFull__
 
 __author__ = 'matteo'
-
-from ObjectUser import  __WriteMatrixCF__, __getMatrixCF__, __getMatrixCF_TESTSET__, Usr
-from RatingPrediction import __UserRatingPrediction__, __RMSE_MAE__, __ItemRatingPrediction__
 
 
 def main(nome,test,nTest=None,dataset='MovieLens',path='/home/matteo/Desktop/DataMining/ml-100k/',X=0,Y=0):
@@ -29,13 +25,17 @@ def main(nome,test,nTest=None,dataset='MovieLens',path='/home/matteo/Desktop/Dat
 
 
 
-    __WriteMatrixCF__(test,10,path,PATH,X,Y)
-    User = __getMatrixCF__(PATH)
-    UserTest = __getMatrixCF_TESTSET__(PATH)
+    #__WriteMatrixCF__(test,10,path,PATH,X,Y)
+    # User = __getMatrixCF__(PATH)
+    # UserTest = __getMatrixCF_TESTSET__(PATH)
+    #
+    #
+    # SimMatrix = __simil_UxU_ObjFull__(User,Y,PATH,Written=True)
+    # print "ok"
+    # __addNote(path,__recSystemObjUxU__(10,User,UserTest,SimMatrix,Y,PATH))
 
-    SimMatrix = __simil_UxU_ObjFull__(User,Y,PATH,Written=False)
-    #print "ok"
-    __addNote(path,__recSystemObjUxU__(10,User,UserTest,SimMatrix,Y,PATH))
+    Item = __getMatrixCF_ITEM__(PATH,X)
+    SimiliIxI = __simil_IxI_ObjFull__(Item,X,PATH,Written=True)
 
 
 

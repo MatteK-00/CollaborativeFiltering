@@ -24,7 +24,7 @@ class Usr:
     def average(self):
         sum = 0.0;
         for i in self.usr_rw:
-            sum += i[1]
+            sum += i[0]
         self.usr_Average = sum/self.rw_count
         return self.usr_Average
 
