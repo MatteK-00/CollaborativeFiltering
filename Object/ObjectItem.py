@@ -21,10 +21,14 @@ class Itm:
 
     def average(self):
         sum = 0.0
-        for i in self.item_rw:
-            sum += i[1]
-        self.usr_Average = sum/self.rw_count
-        return self.usr_Average
+        if self.rw_count != 0:
+            for i in self.item_rw:
+                sum += i[0]
+
+            self.item_Average = sum/self.rw_count
+
+        return self.item_Average
+
 
     def addListRw(self):
         self.usr_rw=list
@@ -45,4 +49,18 @@ def __getMatrixCF_ITEM__(PATH,X):
             for i in ast.literal_eval(line[2]):
                 Item[int(i[1])].addUsrRw(i[0],User_id,i[2])
     read1.close()
+
+    for j in Item:
+        j.average()
     return Item
+
+# def __getMatrixCF_ITEMTEST__(PATH,X):
+#     Item = [Itm(i) for i in range(X)]
+#
+#     with open(PATH+'dataTest', 'r') as read1:
+#         for line in csv.reader(read1, dialect="excel"):
+#             User_id = int(line[0])
+#             for i in ast.literal_eval(line[2]):
+#                 Item[int(i[1])].addUsrRw(i[0],User_id,i[2])
+#     read1.close()
+#     return Item

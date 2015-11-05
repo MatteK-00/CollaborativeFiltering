@@ -60,7 +60,7 @@ def __getMatrixCF_TESTSET__(PATH):
     return User
 
 
-def __WriteMatrixCF__(test,Nrw,path,PATH,X,Y):
+def __WriteMatrixCF__(Nrw,path,PATH,X,Y):
     User = [Usr(i) for i in range(Y)]
     UserT = []
     lineCount = 0

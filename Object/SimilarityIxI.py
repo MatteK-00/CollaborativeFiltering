@@ -17,8 +17,8 @@ def __simil_IxI_Obj__(Item_I,Item_J):
         for user in common_user:
             t_i = filter( lambda x: x[1] == user, Item_I.item_rw)
             t_j = filter( lambda x: x[1] == user, Item_J.item_rw)
-            membro_i = t_i[0][0] - Item_I.average()
-            membro_j = t_j[0][0] - Item_J.average()
+            membro_i = t_i[0][0] - Item_I.item_Average
+            membro_j = t_j[0][0] - Item_J.item_Average
             numeratore += membro_i * membro_j
             denominatore_i += (membro_i**2)
             denominatore_J += (membro_j**2)
@@ -35,7 +35,7 @@ def __simil_IxI_Obj__(Item_I,Item_J):
             return (numeratore/math.sqrt(denominatore))
 
 
-def __simil_IxI_ObjFull__(UserList,X,PATH,Written=True):
+def __simil_IxI_ObjFull__(ItemList,X,PATH,Written=True):
     #The Pearson correlation similarity User-User
 
     if Written:
@@ -52,9 +52,9 @@ def __simil_IxI_ObjFull__(UserList,X,PATH,Written=True):
     else:
         with open(PATH+'SimilMatrixIxI','w') as SM:
             wr = csv.writer(SM, dialect='excel')
-            for I_i in UserList:
+            for I_i in ItemList:
                 row = []
-                for I_j in UserList:
+                for I_j in ItemList:
                     if I_i.item_id == I_j.item_id:
                         row.append(0.0)
                     elif I_i.item_id < I_j.item_id:
@@ -62,4 +62,4 @@ def __simil_IxI_ObjFull__(UserList,X,PATH,Written=True):
                     else:
                         row.append(0.0)
                 wr.writerow(row)
-        return (__simil_IxI_ObjFull__(UserList,X,PATH,True))
+        return (__simil_IxI_ObjFull__(ItemList,X,PATH,True))

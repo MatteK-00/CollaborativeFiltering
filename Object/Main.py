@@ -1,5 +1,8 @@
-from GestioneInput import __initData
-from ObjectItem import __getMatrixCF_ITEM__
+from GestioneInput import __initData, __addNote
+from Object.ObjectItem import __getMatrixCF_ITEM__
+from Object.ObjectUser import __WriteMatrixCF__, __getMatrixCF__, __getMatrixCF_TESTSET__
+from Object.RecommenderSystem import __recSystemObjIxI__, __recSystemObjUxU__
+from Object.SimilarityUxU import __simil_UxU_ObjFull__
 from SimilarityIxI import __simil_IxI_ObjFull__
 
 __author__ = 'matteo'
@@ -25,17 +28,21 @@ def main(nome,test,nTest=None,dataset='MovieLens',path='/home/matteo/Desktop/Dat
 
 
 
-    #__WriteMatrixCF__(test,10,path,PATH,X,Y)
-    # User = __getMatrixCF__(PATH)
-    # UserTest = __getMatrixCF_TESTSET__(PATH)
+    __WriteMatrixCF__(test,path,PATH,X,Y)
+    User = __getMatrixCF__(PATH)
+    UserTest = __getMatrixCF_TESTSET__(PATH)
     #
     #
-    # SimMatrix = __simil_UxU_ObjFull__(User,Y,PATH,Written=True)
+    SimMatrix = __simil_UxU_ObjFull__(User,Y,PATH,Written=False)
     # print "ok"
-    # __addNote(path,__recSystemObjUxU__(10,User,UserTest,SimMatrix,Y,PATH))
+
+    __addNote(path,__recSystemObjUxU__(test,User,UserTest,SimMatrix,Y,PATH))
 
     Item = __getMatrixCF_ITEM__(PATH,X)
-    SimiliIxI = __simil_IxI_ObjFull__(Item,X,PATH,Written=True)
+
+    SimiliIxI = __simil_IxI_ObjFull__(Item,X,PATH,Written=False)
+
+    __addNote(path,__recSystemObjIxI__(test,User,UserTest,Item,SimiliIxI,Y,PATH))
 
 
 
@@ -77,4 +84,4 @@ def main(nome,test,nTest=None,dataset='MovieLens',path='/home/matteo/Desktop/Dat
 
 
 if __name__ == "__main__":
-    main('PROVA_OBJ',10,5)
+    main('PROVA_OBJ',10,8)
