@@ -130,7 +130,7 @@ def __ItemRatingPrediction__(k,PATH,Matrix,SimilMatrix):
 def __RMSE_MAE__(PATH):
     #Measuring Ratings Prediction Accuracy by RMSE (Root Mean Squared Error) and MAE (Mean Absolute Error)
     with open(PATH+'UserRatingPrediction', 'r+a') as URP:
-        counterLine=0;
+        counterLine=0
         RSME = 0.0
         MAE = 0.0
         for line in csv.reader(URP, dialect="excel"):

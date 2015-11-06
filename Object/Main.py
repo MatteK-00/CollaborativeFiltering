@@ -84,4 +84,4 @@ def main(nome,test,nTest=None,dataset='MovieLens',path='/home/matteo/Desktop/Dat
 
 
 if __name__ == "__main__":
-    main('PROVA_OBJ',10,8)
+    main('PROVA_OBJ',30,11)
