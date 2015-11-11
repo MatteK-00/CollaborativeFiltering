@@ -1,6 +1,7 @@
 import csv
 import heapq
 from sets import Set
+import math
 
 __author__ = 'matteo'
 
@@ -26,9 +27,12 @@ def __recSystemObjUxU__(K,UserList,UserTest,SimilMatrix,Y,PATH):
             temp = []
             temp2 = []
             res = []
-            Simil_id = __getK_Simil__(SimilMatrix,UserTest[UT].usr_id,K)
+            #Simil_id = __getK_Simil__(SimilMatrix,UserTest[UT].usr_id,K)
+            Simil_id = []
+            for i in SimilMatrix[UT]:
+                Simil_id.append(i[1])
             for i in Simil_id:
-                temp += heapq.nlargest(K,UserList[i[1]].usr_rw)
+                temp += heapq.nlargest(K,UserList[i].usr_rw)
             for j in temp:
                 temp2.append(j[1])
             for l in temp2:
@@ -38,7 +42,7 @@ def __recSystemObjUxU__(K,UserList,UserTest,SimilMatrix,Y,PATH):
 
             racommendedList = []
             userTestList = UserTest[UT].extractItem()
-            TP = FN = TN = FP = 0
+            TP = FN = FP = 0
             for i in res:
                 racommendedList.append(i[1])
 
@@ -50,35 +54,33 @@ def __recSystemObjUxU__(K,UserList,UserTest,SimilMatrix,Y,PATH):
             for ur in userTestList:
                 if ur not in racommendedList:
                     FN += 1
-                else:
-                    TN += 1
 
-            resP = [TP,FN,FP,TN]
+
+            resP = [TP,FN,FP]
             RES.append(resP)
-            wr1.writerow([UserTest[UT].usr_id,'TP = '+str(TP) +' FN = '+str(FN)+' FP = '+str(FP)+' TN = '+str(TN),userTestList, racommendedList]) #, Precision,Recall.FalsePositiveRate)
+            wr1.writerow([UserTest[UT].usr_id,'TP = '+str(TP) +'FP = '+str(FP),userTestList, racommendedList]) #, Precision,Recall.FalsePositiveRate)
 
-        tp = fn = fp = tn = 0
+        tp = fn = fp  = 0
         for i in RES:
             tp += i[0]
             fn += i[1]
             fp += i[2]
-            tn += i[3]
+
 
         print 'TP =' +str(tp)
-        print 'FN ='+ str(fn)
         print 'FP ='+ str(fp)
-        print 'TN ='+ str(tn)
 
         Precision = (float(tp))/(tp+fp)
         Recall = (float(tp))/(tp+fn)
-        FalsePositiveRate = (float(fp))/(fp+tn)
 
-        wr1.writerow(['Precision = ' +str(Precision) +' Recall = ' + str(Recall) +' FalsePositiveRate = ' + str(FalsePositiveRate)])
+
+        wr1.writerow(['Precision = ' +str(Precision) +' Recall = ' + str(Recall)])
 
         URP.close()
 
 
-    return 'Precision = ' +str(Precision) +' Recall = ' + str(Recall) +' FalsePositiveRate = ' + str(FalsePositiveRate)
+    return 'Precision = ' +str(Precision) +' Recall = ' + str(Recall) + ' TP =' +str(tp) + ' FP = '+ str(fp)
+
 
 
 def __recSystemObjIxI__(K,User,UserTest,ItemList,SimilMatrix,Y,PATH):
@@ -89,37 +91,47 @@ def __recSystemObjIxI__(K,User,UserTest,ItemList,SimilMatrix,Y,PATH):
 
         for UT in range(0,len(UserTest)):
             Simil_id = []
-            bestUserItem = []
+            racommendedListTemp = []
             racommendedList = []
             racommendedPart = []
-            bestUserItemTemp = heapq.nlargest(K,User[UT].usr_rw)
-            for bui in bestUserItemTemp:
-                bestUserItem.append(bui[1])
+            racommendedListId = []
+            bestUserItem = heapq.nlargest(K,User[UT].usr_rw)
+
             for item in bestUserItem:
-                Simil_id += __getK_Simil__(SimilMatrix,item,K)
+                 Simil_id.append(item[1])
 
-            for j in Simil_id:
-                racommendedPart.append((ItemList[j[1]].rw_count, ItemList[j[1]].item_Average, j[1]))
+            for it in Simil_id:
+                racommendedListTemp += SimilMatrix[it]
 
-            racommendedPart = heapq.nlargest(K,racommendedPart)
+            for it_id in racommendedListTemp:
+                racommendedPart.append(it_id[1])
 
-            for i in racommendedPart:
-                racommendedList.append(i[2])
+            for l in racommendedPart:
+                racommendedList.append((racommendedPart.count(l),l))
+
+            racommendedList = Set(racommendedList)
+
+            racommendedList = heapq.nlargest(K,racommendedList)
+
+            for boh in racommendedList:
+                racommendedListId.append(boh[1])
+
+
 
             UserTestList = UserTest[UT].extractItem()
             TP = FN  = FP = 0
 
-            for rl in racommendedList:
+            for rl in racommendedListId:
                 if rl in UserTestList:
                     TP +=1
                 else:
                     FP +=1
             for ur in UserTestList:
-                if ur not in racommendedList:
+                if ur not in racommendedListId:
                     FN += 1
             resP = [TP,FN,FP]
             RES.append(resP)
-            wr1.writerow([UT,'TP = '+str(TP) +' FN = '+str(FN)+' FP = '+str(FP), racommendedList])
+            wr1.writerow([UT,' TP = '+str(TP) +' FP = '+str(FP),UserTestList, racommendedListId])
 
         tp = fn = fp  = 0
         for i in RES:
@@ -129,7 +141,6 @@ def __recSystemObjIxI__(K,User,UserTest,ItemList,SimilMatrix,Y,PATH):
 
 
         print 'TP =' +str(tp)
-        print 'FN ='+ str(fn)
         print 'FP ='+ str(fp)
 
         Precision = (float(tp))/(tp+fp)
@@ -140,4 +151,25 @@ def __recSystemObjIxI__(K,User,UserTest,ItemList,SimilMatrix,Y,PATH):
         URP.close()
 
 
-    return 'Precision = ' +str(Precision) +' Recall = ' + str(Recall)
+    return 'Precision = ' +str(Precision) +' Recall = ' + str(Recall)  + ' TP = ' +str(tp) + ' FP = '+ str(fp)
+
+
+
+
+
+def sigmoid(x):
+  return 1 / (1 + math.exp(-x))
+
+# def __NDPM__(User,UserTestList,RecommenderList):
+#     res = []
+#     for i in range(0,len(RecommenderList)):
+#         if RecommenderList[i] in UserTestList: #C^+
+#             sigmoid()*sigmoid((i+1)-(UserTestList.index(RecommenderList[i])-1))
+#         else: #C^-
+#
+    #
+    #
+    #
+    #
+    # C_plus = res
+    # return

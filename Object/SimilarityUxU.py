@@ -1,7 +1,9 @@
+import ast
 import csv
 import heapq
 import math
 from sets import Set
+from SimilarityIxI import sampleStandardDeviation
 
 __author__ = 'matteo'
 
@@ -9,17 +11,14 @@ __author__ = 'matteo'
 
 
 
-def __simil_UxU_ObjFull__(UserList,Y,PATH,Written=True):
+def __simil_UxU_ObjFull__(UserList,K,Y,PATH,Written=True):
     #The Pearson correlation similarity User-User
 
     if Written:
-        SimilMatrix = [[0 for x in range(Y)] for y in range(Y)]
+        SimilMatrix = []
         with open(PATH+'SimilMatrixUxU','r') as SM:
-            counterLine = 0
             for line in csv.reader(SM, dialect="excel"):
-                for i in range(0,len(SimilMatrix)):
-                    SimilMatrix[counterLine][i] = line[i]
-                counterLine +=1
+                SimilMatrix.append(ast.literal_eval(line[0]))
             SM.close()
 
         return SimilMatrix
@@ -30,13 +29,15 @@ def __simil_UxU_ObjFull__(UserList,Y,PATH,Written=True):
                 row = []
                 for U_j in UserList:
                     if U_i.usr_id == U_j.usr_id:
-                        row.append(0.0)
-                    elif U_i.usr_id < U_j.usr_id:
-                        row.append(__simil_UxU_Obj__(U_i,U_j))
+                        row.append((0.0, U_i.usr_id))
                     else:
-                        row.append(0.0)
-                wr.writerow(row)
-        return (__simil_UxU_ObjFull__(UserList,Y,PATH,True))
+                        #row.append((__simil_UxU_Obj__(U_i,U_j),U_j.usr_id))
+                        row.append((pearson(U_i,U_j),U_j.usr_id))
+
+                    row=heapq.nlargest(K,row)
+
+                wr.writerow([row])
+        return (__simil_UxU_ObjFull__(UserList,K,Y,PATH,True))
 
 
 def __simil_UxU_Obj__(User_I,User_J):
@@ -51,8 +52,8 @@ def __simil_UxU_Obj__(User_I,User_J):
         for item in common_item:
             t_i = filter( lambda x: x[1] == item, User_I.usr_rw)
             t_j = filter( lambda x: x[1] == item, User_J.usr_rw)
-            membro_i = t_i[0][0] - User_I.average()
-            membro_j = t_j[0][0] - User_J.average()
+            membro_i = t_i[0][0] - User_I.usr_Average
+            membro_j = t_j[0][0] - User_J.usr_Average
             numeratore += membro_i * membro_j
             denominatore += (membro_i**2) * (membro_j**2)
 
@@ -67,3 +68,33 @@ def __simil_UxU_Obj__(User_I,User_J):
             return (numeratore/math.sqrt(denominatore))
 
 
+def pearson(User_I, User_J):
+    score_i = []
+    score_j = []
+
+    common_user = []#list(set(l_i).intersection(l_j))
+    for i in User_I.usr_rw:
+       for j in User_J.usr_rw:
+            if i[1] == j[1]:
+                common_user.append((i[0],j[0]))
+
+    if common_user == []:
+        return 0.0
+    else:
+        stdDev = sampleStandardDeviation(common_user, User_I.usr_Average,User_J.usr_Average)
+
+        if stdDev[0] == 0 or stdDev[1] == 0:
+            return 0.0
+        else:
+            for x in common_user:
+                score_i.append((x[0] - User_I.usr_Average)/stdDev[0])
+                score_j.append((x[1] - User_J.usr_Average)/stdDev[1])
+
+        # multiplies both lists together into 1 list (hence zip) and sums the whole list
+        # using zip to iterate over two lists in parallel
+        valoreDaRitornare = 0.0
+        try:
+            valoreDaRitornare = (sum([i*j for i, j in zip(score_i, score_j)]))/(len(common_user)-1)
+        except Exception:
+            pass
+        return valoreDaRitornare

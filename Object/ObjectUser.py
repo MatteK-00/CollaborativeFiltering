@@ -47,6 +47,10 @@ def __getMatrixCF__(PATH):
             temp.usr_rw = ast.literal_eval(line[2])
             User.append(temp)
     read1.close()
+
+    for j in User:
+        j.average()
+
     return User
 
 def __getMatrixCF_TESTSET__(PATH):
@@ -60,15 +64,16 @@ def __getMatrixCF_TESTSET__(PATH):
     return User
 
 
-def __WriteMatrixCF__(Nrw,path,PATH,X,Y):
+def __WriteMatrixCF__(Nrw,path,PATH,X,Y,listaEsclusi=[]):
     User = [Usr(i) for i in range(Y)]
     UserT = []
     lineCount = 0
 
     with open(path+'u.data', 'r') as read1:
         for line in csv.reader(read1, dialect="excel-tab"):
-            User[(int(line[0])-1)].addItemRw(line[2],int(line[1])-1,line[3])
-            lineCount += 1
+            if (int(line[1])-1) not in listaEsclusi:
+                User[(int(line[0])-1)].addItemRw(line[2],int(line[1])-1,line[3])
+                lineCount += 1
     read1.close()
 
     for U in User:
