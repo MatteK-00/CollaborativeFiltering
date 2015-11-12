@@ -109,8 +109,8 @@ def __simil_IxI_ObjFull2__(ItemList,K,X,PATH,Written=True):
                     if I_i.item_id == I_j.item_id:
                         row.append((0.0, I_i.item_id))
                     else:
-                        #row.append((__simil_IxI_Obj__(I_i,I_j),I_j.item_id))
-                        row.append((__pearsonIxI__(I_i,I_j),I_j.item_id))
+                        row.append((__simil_IxI_Obj__(I_i,I_j),I_j.item_id))
+                        #row.append((__pearsonIxI__(I_i,I_j),I_j.item_id))
 
                     row = heapq.nlargest(K,row)
                 #print time.time() - a

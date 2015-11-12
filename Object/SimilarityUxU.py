@@ -40,6 +40,35 @@ def __simil_UxU_ObjFull__(UserList,K,Y,PATH,Written=True):
         return (__simil_UxU_ObjFull__(UserList,K,Y,PATH,True))
 
 
+def __simil_UxU_ObjFull2__(UserList,K,Y,PATH,Written=True):
+    #The Pearson correlation similarity User-User
+
+    if Written:
+        SimilMatrix = []
+        with open(PATH+'SimilMatrixUxU','r') as SM:
+            for line in csv.reader(SM, dialect="excel"):
+                SimilMatrix.append(ast.literal_eval(line[0]))
+            SM.close()
+
+        return SimilMatrix
+    else:
+        with open(PATH+'SimilMatrixUxU','w') as SM:
+            wr = csv.writer(SM, dialect='excel')
+            for U_i in UserList:
+                row = []
+                for U_j in UserList:
+                    if U_i.usr_id == U_j.usr_id:
+                        row.append((0.0, U_i.usr_id))
+                    else:
+                        row.append((__simil_UxU_Obj__(U_i,U_j),U_j.usr_id))
+                        #row.append((pearson(U_i,U_j),U_j.usr_id))
+
+                    row=heapq.nlargest(K,row)
+
+                wr.writerow([row])
+        return (__simil_UxU_ObjFull__(UserList,K,Y,PATH,True))
+
+
 def __simil_UxU_Obj__(User_I,User_J):
     l_i = User_I.extractItem()
     l_j = User_J.extractItem()
