@@ -91,5 +91,5 @@ def main(nome,test,nTest=None,dataset='ml-100k',path='/home/matteo/Desktop/DataM
 
 
 
-if __name__ == "__main__":
-    main('TEST_FullData',10,0,dataset='ml-1m')
+#if __name__ == "__main__":
+    #main('TEST_FullData',10,0,dataset='ml-1m')

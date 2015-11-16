@@ -18,10 +18,11 @@ def __getK_Simil__(SimilMatrix, ID, k):
     return listres
 
 
-def __recSystemObjUxU__(K,UserList,UserTest,SimilMatrix,Y,PATH):
+def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
     with open (PATH+'UsagePredictionUxU','w') as URP:
         wr1 = csv.writer(URP, dialect='excel')
-        RES = []
+        resTP = 0
+        TEST_SET_NON_OK = 0
 
         for UT in range(0,len(UserTest)):
             temp = []
@@ -30,10 +31,18 @@ def __recSystemObjUxU__(K,UserList,UserTest,SimilMatrix,Y,PATH):
             res2 = []
             #Simil_id = __getK_Simil__(SimilMatrix,UserTest[UT].usr_id,K)
             Simil_id = []
-            for i in SimilMatrix[UT]:
+            for i in heapq.nlargest(K_1,SimilMatrix[UT]):
                 Simil_id.append(i[1])
+
+            #CONFRONTO CON IL TEST SET
+            confronto = UserTest[UT].extractItem()
             for i in Simil_id:
-                temp += heapq.nlargest(K,UserList[i].usr_rw)
+                temp1 = []
+                for item in UserList[i].usr_rw:
+                    if item[1] in confronto:
+                        temp1.append(item)
+                temp += heapq.nlargest(K_2,temp1)
+
             for j in temp:
                 temp2.append(j[1])
             for l in temp2:
@@ -41,54 +50,42 @@ def __recSystemObjUxU__(K,UserList,UserTest,SimilMatrix,Y,PATH):
             res = Set(res)
 
             #CONFRONTO CON IL TRAINING SET
-            confronto = UserList[UT].extractItem()
-            for boh in res:
-                if boh[1] not in confronto:
-                    res2.append(boh)
-            #------------------
+            #confronto = UserList[UT].extractItem()
+            #for boh in res:
+            #    if boh[1] not in confronto:
+            #        res2.append(boh)
+            #----------------------------#
 
-            res = heapq.nlargest(K,res)
+            res = heapq.nlargest(K_3,res)
 
             racommendedList = []
-            userTestList = UserTest[UT].extractItem()
-            TP = FN = FP = 0
             for i in res:
                 racommendedList.append(i[1])
 
+
+            userTestList = __estraiItemTEST__(K_3,UserTest[UT].usr_rw)
+
+            TP = 0
             for rl in racommendedList:
                 if rl in userTestList:
                     TP +=1
-                else:
-                    FP +=1
-            for ur in userTestList:
-                if ur not in racommendedList:
-                    FN += 1
 
 
-            resP = [TP,FN,FP]
-            RES.append(resP)
-            wr1.writerow([UserTest[UT].usr_id,'TP = '+str(TP) +'FP = '+str(FP),userTestList, racommendedList]) #, Precision,Recall.FalsePositiveRate)
+            if userTestList[0] == 'voti troppo pochi o bassi':
+                TEST_SET_NON_OK+=1
 
-        tp = fn = fp  = 0
-        for i in RES:
-            tp += i[0]
-            fn += i[1]
-            fp += i[2]
+            resTP += TP
+            wr1.writerow([UserTest[UT].usr_id,'Vicinato = ' + Simil_id,'TP = '+str(TP),userTestList, racommendedList])
 
+        print 'TP = ' +str(TP)
+        print 'Righe dataset scartate = '+ str(TEST_SET_NON_OK)
 
-        print 'TP =' +str(tp)
-        print 'FP ='+ str(fp)
-
-        Precision = (float(tp))/(tp+fp)
-        Recall = (float(tp))/(tp+fn)
-
-
-        wr1.writerow(['Precision = ' +str(Precision) +' Recall = ' + str(Recall)])
+        wr1.writerow(['TP = ' +str(TP) + 'Righe dataset scartate = '+ str(TEST_SET_NON_OK)+'K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)])
 
         URP.close()
 
 
-    return 'Precision = ' +str(Precision) +' Recall = ' + str(Recall) + ' TP =' +str(tp) + ' FP = '+ str(fp)
+    return 'TP = ' +str(TP) + 'Righe dataset scartate = '+ str(TEST_SET_NON_OK)+'K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)
 
 
 
@@ -163,22 +160,18 @@ def __recSystemObjIxI__(K,User,UserTest,ItemList,SimilMatrix,Y,PATH):
     return 'Precision = ' +str(Precision) +' Recall = ' + str(Recall)  + ' TP = ' +str(tp) + ' FP = '+ str(fp)
 
 
+def __estraiItemTEST__(K_3,Lista_RW):
+    counter = 0
+    res = []
+    Lista_RW.sort(None,None,True)
+    for i in Lista_RW:
+        if i[0] == 5:
+            res.append(i[1])
+            counter += 1
+        elif i[0] == 4 and counter < K_3:
+            res.append(i[1])
+        elif i[0] < 4 and counter < K_3:
+            return ['voti troppo pochi o bassi']
 
 
-
-def sigmoid(x):
-  return 1 / (1 + math.exp(-x))
-
-# def __NDPM__(User,UserTestList,RecommenderList):
-#     res = []
-#     for i in range(0,len(RecommenderList)):
-#         if RecommenderList[i] in UserTestList: #C^+
-#             sigmoid()*sigmoid((i+1)-(UserTestList.index(RecommenderList[i])-1))
-#         else: #C^-
-#
-    #
-    #
-    #
-    #
-    # C_plus = res
-    # return
+    return res
