@@ -27,17 +27,17 @@ def main(nome,nTest=None,K_0=20,K_1=10,K_2=5,K_3=3,K_4=20,dataset='ml-100k',path
 
     print PATH
 
-    __WriteMatrixCF__(K_0,path,PATH,X,Y)
+    #__WriteMatrixCF__(K_0,path,PATH,X,Y)
     Item = __getMatrixCF_ITEM__(PATH,X)
     User = __getMatrixCF__(PATH)
     UserTest = __getMatrixCF_TESTSET__(PATH)
     #
     print "----------------"
     #
-    SimMatrix = __simil_UxU_ObjFull__(User,K_4,Y,PATH,Written=False)
+    SimMatrix = __simil_UxU_ObjFull__(User,K_4,Y,PATH,Written=True)
     #
     #
-    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,Y,PATH,K_1,K_2,K_3))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,K_1,K_2,K_3))
     #
     # print "----------------"
     #
@@ -63,7 +63,14 @@ if __name__ == "__main__":
     #K_2 = NUMERO DI OGGETTI DA ESTRARRE PER OGNI UTENTE NEL VICINATO
     #K_3 = NUMERO DI RACCOMANDAZIONI FINALE
     #K_4 = DIMENSIONE RIGA MATRICE DI SIMILARITA'
-    main('FullData',0,K_0=20,K_1=10,K_2=5,K_3=3,K_4=20 ,dataset='ml-100k')
+    main('FullData',3,K_0=30,K_1=4,K_2=4,K_3=2,K_4=20 ,dataset='ml-100k')
+
+
+
+    #for k1 in range (1,16):
+    #    for k2 in range (1,11):
+    #        for k3 in range(1,5):
+    #            main('FullData',3,K_0=30,K_1=k1,K_2=k2,K_3=k3,K_4=20 ,dataset='ml-100k')
 
 
 

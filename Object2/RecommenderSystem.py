@@ -23,25 +23,38 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
         wr1 = csv.writer(URP, dialect='excel')
         resTP = 0
         TEST_SET_NON_OK = 0
+        REC_LIST_EMPTY = 0
 
         for UT in range(0,len(UserTest)):
+            #UT = 18
             temp = []
             temp2 = []
             res = []
             res2 = []
             #Simil_id = __getK_Simil__(SimilMatrix,UserTest[UT].usr_id,K)
             Simil_id = []
-            for i in heapq.nlargest(K_1,SimilMatrix[UT]):
-                Simil_id.append(i[1])
+
+            #for i in heapq.nlargest(K_1,SimilMatrix[UT]):
+                #Simil_id.append(i[1])
+
+            Simil_id = heapq.nlargest(K_1,SimilMatrix[UT])
+
+            Simil_id_Lista = []
 
             #CONFRONTO CON IL TEST SET
             confronto = UserTest[UT].extractItem()
-            for i in Simil_id:
+            for i in range(0,len(Simil_id)):
                 temp1 = []
-                for item in UserList[i].usr_rw:
+                id = Simil_id[i][1]
+                list = []
+                for item in UserList[Simil_id[i][1]].usr_rw:
                     if item[1] in confronto:
                         temp1.append(item)
+                        list.append(item)
+
+                Simil_id_Lista.append((id,list))
                 temp += heapq.nlargest(K_2,temp1)
+            #------------------------#
 
             for j in temp:
                 temp2.append(j[1])
@@ -62,31 +75,44 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
             for i in res:
                 racommendedList.append(i[1])
 
-
+            #prova1 = UserTest[UT].usr_rw
             userTestList = __estraiItemTEST__(K_3,UserTest[UT].usr_rw)
 
             TP = 0
-            for rl in racommendedList:
-                if rl in userTestList:
+            for rl in userTestList:
+                if rl[0] in racommendedList:
                     TP +=1
+
+            recListPrint = []
+            for rl in racommendedList:
+                for i in UserTest[UT].usr_rw:
+                    if rl == i[1]:
+                        recListPrint.append((rl,i[0]))
 
 
             if userTestList[0] == 'voti troppo pochi o bassi':
                 TEST_SET_NON_OK+=1
+            elif racommendedList == []:
+                REC_LIST_EMPTY += 1
+                #prova = UserTest[UT].usr_rw
+                #wr1.writerow([UserTest[UT].usr_id,prova,prova1,userTestList, racommendedList])
 
             resTP += TP
-            wr1.writerow([UserTest[UT].usr_id,'Vicinato = ' + Simil_id,'TP = '+str(TP),userTestList, racommendedList])
+            #wr1.writerow([UserTest[UT].usr_id,'Vicinato = ',Simil_id,'TP = '+str(TP),userTestList, racommendedList])
+            URP.write(str(UserTest[UT].usr_id) + ' Vicinato = ' + str(Simil_id) + ' TP = ' +str(TP) + str(userTestList) + str(recListPrint) + '\n')
+            URP.write('Vicinato esteso ' + str(Simil_id_Lista) + '\n')
 
-        print 'TP = ' +str(TP)
+        print 'TP = ' +str(resTP)
         print 'Righe dataset scartate = '+ str(TEST_SET_NON_OK)
+        print 'Righe con rec list vuota = ' + str(REC_LIST_EMPTY)
 
-        wr1.writerow(['TP = ' +str(TP) + 'Righe dataset scartate = '+ str(TEST_SET_NON_OK)+'K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)])
+        wr1.writerow(['TP = ' +str(resTP) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)])
 
         URP.close()
 
 
-    return 'TP = ' +str(TP) + 'Righe dataset scartate = '+ str(TEST_SET_NON_OK)+'K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)
-
+    return 'TP = ' +str(resTP) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3), ' REC_EMPTY =' + str(REC_LIST_EMPTY)
+    #return str(TEST_SET_NON_OK),str(resTP),str(K_1),str(K_2),str(K_3)
 
 
 def __recSystemObjIxI__(K,User,UserTest,ItemList,SimilMatrix,Y,PATH):
@@ -166,10 +192,11 @@ def __estraiItemTEST__(K_3,Lista_RW):
     Lista_RW.sort(None,None,True)
     for i in Lista_RW:
         if i[0] == 5:
-            res.append(i[1])
+            res.append((i[1],(i[0])))
             counter += 1
         elif i[0] == 4 and counter < K_3:
-            res.append(i[1])
+            res.append((i[1],(i[0])))
+            counter += 1
         elif i[0] < 4 and counter < K_3:
             return ['voti troppo pochi o bassi']
 
