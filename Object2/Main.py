@@ -2,7 +2,7 @@ from GestioneInput import __initData, __addNote
 from ObjectItem import __getMatrixCF_ITEM__, stampaItemCount,__listaItemEliminati__
 from ObjectUser import __WriteMatrixCF__, __getMatrixCF__, __getMatrixCF_TESTSET__
 from RecommenderSystem import __recSystemObjUxU__, ____recSystemObjUxUNextNeighbour__
-from SimilarityUxU import __simil_UxU_ObjFull__, __simil_UxU_ObjFull2__
+from SimilarityUxU import __simil_UxU_ObjFull__, __simil_UxU_ObjFull2__, __simil_UxU_ObjProva__, pearson
 from SimilarityIxI import __simil_IxI_ObjFull__, __simil_IxI_ObjFull2__
 
 __author__ = 'matteo'
@@ -34,12 +34,15 @@ def main(nome,nTest=None,K_0=20,K_1=10,K_2=5,K_3=3,K_4=20,dataset='ml-100k',path
     #
     print "----------------"
     #
-    SimMatrix = __simil_UxU_ObjFull__(User,K_4,Y,PATH,Written=False)
+    #SimMatrix = __simil_UxU_ObjFull__(User,K_4,Y,PATH,Written=False)
     #
     #
-    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,K_1,K_2,K_3))
+    #__addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,K_1,K_2,K_3))
     print "----------------"
-    __addNote(path,____recSystemObjUxUNextNeighbour__(User,UserTest,SimMatrix,PATH,K_1,K_2,K_3,K_4))
+    #__addNote(path,____recSystemObjUxUNextNeighbour__(User,UserTest,SimMatrix,PATH,K_1,K_2,K_3,K_4))
+
+
+
     #
     # print "----------------"
     #

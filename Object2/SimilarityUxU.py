@@ -169,7 +169,7 @@ def __simil_UxU_ObjProva__(User_I,User_J):
             denominatore_i += (membro_i**2)
             denominatore_j += (membro_j**2)
 
-        if denominatore_i == 0 or denominatore_j == 0:
+        if denominatore_i == 0.0 or denominatore_j == 0.0:
             return 0.0
         else:
             return (numeratore/math.sqrt(denominatore_i*denominatore_j))
