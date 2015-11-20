@@ -31,8 +31,8 @@ def __simil_UxU_ObjFull__(UserList,K,Y,PATH,Written=True):
                     if U_i.usr_id == U_j.usr_id:
                         row.append((0.0, U_i.usr_id))
                     else:
-                        #row.append((__simil_UxU_Obj__(U_i,U_j),U_j.usr_id))
-                        row.append((pearson(U_i,U_j),U_j.usr_id))
+                        row.append((__simil_UxU_ObjProva__(U_i,U_j),U_j.usr_id))
+                        #row.append((pearson(U_i,U_j),U_j.usr_id))
 
                     row=heapq.nlargest(K,row)
 
@@ -68,8 +68,8 @@ def __simil_UxU_ObjFull2__(UserList,K,Y,PATH,Written=True):
                     if U_i.usr_id == U_j.usr_id:
                         row.append((0.0, U_i.usr_id))
                     else:
-                        row.append((__simil_UxU_ObjProva__(U_i,U_j),U_j.usr_id))
-                        #row.append((pearson(U_i,U_j),U_j.usr_id))
+                        #row.append((__simil_UxU_ObjProva__(U_i,U_j),U_j.usr_id))
+                        row.append((pearson(U_i,U_j),U_j.usr_id))
 
                     row=heapq.nlargest(K,row)
 
