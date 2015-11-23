@@ -27,7 +27,6 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
         test = []
 
         for UT in range(0,len(UserTest)):
-            #UT = 18
             temp = []
             temp2 = []
             res = []
@@ -38,8 +37,8 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
             #for i in heapq.nlargest(K_1,SimilMatrix[UT]):
                 #Simil_id.append(i[1])
 
-            Simil_id = heapq.nlargest(K_1,SimilMatrix[UT])
-
+            #Simil_id = heapq.nlargest(K_1,SimilMatrix[UT])
+            Simil_id = SimilMatrix[UT]
             Simil_id_Lista = []
 
             #CONFRONTO CON IL TEST SET
@@ -49,12 +48,12 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
                 id = Simil_id[i][1]
                 list = []
                 for item in UserList[Simil_id[i][1]].usr_rw:
-                    if item[1] in confronto:
+                    if item[1] in confronto and item[0] >= 4:
                         temp1.append(item)
                         list.append(item)
 
                 Simil_id_Lista.append((id,list))
-                temp += heapq.nlargest(K_2,temp1)
+                temp += temp1
             #------------------------#
 
             for j in temp:
@@ -68,7 +67,6 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
             #for boh in res:
             #    if boh[1] not in confronto:
             #        res2.append(boh)
-            #----------------------------#
 
             res = heapq.nlargest(K_3,res)
 
@@ -76,7 +74,8 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
             for i in res:
                 racommendedList.append(i[1])
 
-            #prova1 = UserTest[UT].usr_rw
+            #prova1 = UserTest[UT].usr_rw#----------------------------#
+
             userTestList = __estraiItemTEST__(K_3,UserTest[UT].usr_rw)
 
             TP = 0
@@ -104,18 +103,21 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
             #wr1.writerow([UserTest[UT].usr_id,'Vicinato = ',Simil_id,'TP = '+str(TP),userTestList, racommendedList])
             URP.write(str(UserTest[UT].usr_id) + ' Vicinato = ' + str(Simil_id) + ' TP = ' +str(TP) + str(userTestList) + str(recListPrint) + '\n')
             URP.write('Vicinato esteso ' + str(Simil_id_Lista) + '\n')
+            URP.write('\n')
 
         print 'TP = ' +str(resTP)
         print 'Righe con test set non ok = '+ str(TEST_SET_NON_OK)
         print 'Raccomandazioni in meno  = ' + str(REC_LIST_EMPTY)
         #print test
+        precision = (resTP*100)/float(((len(UserList)-TEST_SET_NON_OK)*K_3)-REC_LIST_EMPTY)
+        print precision
 
         wr1.writerow(['TP = ' +str(resTP) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)])
 
         URP.close()
 
 
-    return 'TP = ' +str(resTP) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3), ' REC_EMPTY =' + str(REC_LIST_EMPTY)
+    return'TP = ' +str(resTP) + ' Precision = '+ str(precision) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3), ' REC_EMPTY =' + str(REC_LIST_EMPTY)
     #return str(TEST_SET_NON_OK),str(resTP),str(K_1),str(K_2),str(K_3)
 
 
@@ -144,7 +146,7 @@ def ____recSystemObjUxUNextNeighbour__(UserList,UserTest,SimilMatrix,PATH,K_1=1,
                 res = []
                 Simil_id = heapq.nlargest(K_1*counter,SimilMatrix[UT])
 
-                if len(Simil_id) == K_4:
+                if len(Simil_id) == len(SimilMatrix[UT]):
                     controllo = False
 
 
@@ -221,12 +223,15 @@ def ____recSystemObjUxUNextNeighbour__(UserList,UserTest,SimilMatrix,PATH,K_1=1,
         print 'Righe con test set non ok = '+ str(TEST_SET_NON_OK)
         print 'Raccomandazioni in meno  = ' + str(REC_LIST_EMPTY)
 
-        wr1.writerow(['TP = ' +str(resTP) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)])
+
+        precision = resTP*100/float((len(UserList)-TEST_SET_NON_OK)*K_3-REC_LIST_EMPTY)
+        print precision
+        wr1.writerow(['TP = ' +str(resTP)  +' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)])
 
         URP.close()
 
 
-    return 'TP = ' +str(resTP) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3), ' REC_EMPTY =' + str(REC_LIST_EMPTY)
+    return 'TP = ' +str(resTP) + ' Precision = '+ str(precision) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3), ' REC_EMPTY =' + str(REC_LIST_EMPTY)
     #return str(TEST_SET_NON_OK),str(resTP),str(K_1),str(K_2),str(K_3)
 
 

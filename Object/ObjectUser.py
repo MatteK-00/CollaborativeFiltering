@@ -64,7 +64,7 @@ def __getMatrixCF_TESTSET__(PATH):
     return User
 
 
-def __WriteMatrixCF__(Nrw,path,PATH,X,Y,listaEsclusi=[]):
+def __WriteMatrixCF__(Prw,path,PATH,X,Y,listaEsclusi=[]):
     User = [Usr(i) for i in range(Y)]
     UserT = []
     lineCount = 0
@@ -76,17 +76,20 @@ def __WriteMatrixCF__(Nrw,path,PATH,X,Y,listaEsclusi=[]):
                 lineCount += 1
     read1.close()
 
-    for U in User:
-        if U.rw_count > Nrw:
-            l = []
-            shuffle(U.usr_rw)
-            for i in range(0,Nrw):
-                l.append(U.usr_rw.pop())
 
-            U.rw_count -= Nrw
-            temp = Usr(U.usr_id,Nrw)
-            temp.usr_rw = l
-            UserT.append(temp)
+
+    for U in User:
+        Nrw = int(Prw*U.rw_count/100)
+
+        l = []
+        shuffle(U.usr_rw)
+        for i in range(0,Nrw):
+            l.append(U.usr_rw.pop())
+
+        U.rw_count -= Nrw
+        temp = Usr(U.usr_id,Nrw)
+        temp.usr_rw = l
+        UserT.append(temp)
 
     with open(PATH+'dataTraining','w') as file1:
         wr1 = csv.writer(file1, dialect='excel')
@@ -104,6 +107,72 @@ def __WriteMatrixCF__(Nrw,path,PATH,X,Y,listaEsclusi=[]):
         file2.close()
 
 
+
+
+def __WriteMatrixCF2__(Prw,path,PATH,X,Y,listaEsclusi=[]):
+    User = [Usr(i) for i in range(Y)]
+    UserT = []
+    lineCount = 0
+
+    with open(path+'u.data', 'r') as read1:
+        for line in csv.reader(read1, dialect="excel-tab"):
+            if (int(line[1])-1) not in listaEsclusi:
+                User[(int(line[0])-1)].addItemRw(line[2],int(line[1])-1,line[3])
+                lineCount += 1
+    read1.close()
+
+    for U in User:
+        Nrw = int(Prw*U.rw_count/100)
+
+        l = []
+        shuffle(U.usr_rw)
+        for i in range(0,Nrw):
+            l.append(U.usr_rw.pop())
+
+        U.rw_count -= Nrw
+        temp = Usr(U.usr_id,Nrw)
+        temp.usr_rw = l
+        UserT.append(temp)
+
+    with open(PATH+'dataTraining2','w') as file1:
+        wr1 = csv.writer(file1, dialect='excel')
+        for U in User:
+            wr1.writerow([U.usr_id,U.rw_count,U.usr_rw])
+
+        file1.close()
+
+
+    with open(PATH+'dataTest2','w') as file2:
+        wr2 = csv.writer(file2, dialect='excel')
+        for T in UserT:
+            wr2.writerow([T.usr_id,T.rw_count,T.usr_rw])
+
+        file2.close()
+
+
+def __getMatrixCF2__(PATH):
+    User = []
+    with open(PATH+'dataTraining2', 'r') as read1:
+        for line in csv.reader(read1, dialect="excel"):
+            temp = Usr(int(line[0]),int(line[1]))
+            temp.usr_rw = ast.literal_eval(line[2])
+            User.append(temp)
+    read1.close()
+
+    for j in User:
+        j.average()
+
+    return User
+
+def __getMatrixCF_TESTSET2__(PATH):
+    User = []
+    with open(PATH+'dataTest2', 'r') as read1:
+        for line in csv.reader(read1, dialect="excel"):
+            temp = Usr(int(line[0]),int(line[1]))
+            temp.usr_rw = ast.literal_eval(line[2])
+            User.append(temp)
+    read1.close()
+    return User
 
 
 

@@ -31,20 +31,20 @@ def __simil_UxU_ObjFull__(UserList,K,Y,PATH,Written=True):
                     if U_i.usr_id == U_j.usr_id:
                         row.append((0.0, U_i.usr_id))
                     else:
-                        row.append((__simil_UxU_ObjProva__(U_i,U_j),U_j.usr_id))
-                        #row.append((pearson(U_i,U_j),U_j.usr_id))
+                        #row.append((__simil_UxU_ObjProva__(U_i,U_j),U_j.usr_id))
+                        row.append((pearson(U_i,U_j),U_j.usr_id))
 
-                    row=heapq.nlargest(K,row)
+                    #row=heapq.nlargest(K,row)
 
-                #row.sort(None,None,True)
-                #counter = 0
-                #for i in range(0,len(row)):
-                #    if i[0] <= K:
-                #        counter = i
-                #        break
+                row.sort(None,None,True)
+                counter = 0
+                for i in range(0,len(row)):
+                    if row[i][0] <= K:
+                        counter = i
+                        break
 
-                #wr.writerow([row[0:counter]])
-                wr.writerow([row])
+                wr.writerow([row[0:counter]])
+                #wr.writerow([row])
         return (__simil_UxU_ObjFull__(UserList,K,Y,PATH,True))
 
 
@@ -53,14 +53,14 @@ def __simil_UxU_ObjFull2__(UserList,K,Y,PATH,Written=True):
 
     if Written:
         SimilMatrix = []
-        with open(PATH+'SimilMatrixUxU','r') as SM:
+        with open(PATH+'SimilMatrixUxU2','r') as SM:
             for line in csv.reader(SM, dialect="excel"):
                 SimilMatrix.append(ast.literal_eval(line[0]))
             SM.close()
 
         return SimilMatrix
     else:
-        with open(PATH+'SimilMatrixUxU','w') as SM:
+        with open(PATH+'SimilMatrixUxU2','w') as SM:
             wr = csv.writer(SM, dialect='excel')
             for U_i in UserList:
                 row = []
@@ -68,13 +68,20 @@ def __simil_UxU_ObjFull2__(UserList,K,Y,PATH,Written=True):
                     if U_i.usr_id == U_j.usr_id:
                         row.append((0.0, U_i.usr_id))
                     else:
-                        #row.append((__simil_UxU_ObjProva__(U_i,U_j),U_j.usr_id))
-                        row.append((pearson(U_i,U_j),U_j.usr_id))
+                        row.append((__simil_UxU_Obj__(U_i,U_j),U_j.usr_id))
+                        #row.append((pearson(U_i,U_j),U_j.usr_id))
 
-                    row=heapq.nlargest(K,row)
+                row.sort(None,None,True)
+                counter = 0
+                for i in range(0,len(row)):
+                    if row[i][0] <= K:
+                        counter = i
+                        break
 
-                wr.writerow([row])
-        return (__simil_UxU_ObjFull__(UserList,K,Y,PATH,True))
+                wr.writerow([row[0:counter]])
+                #wr.writerow([row])
+
+        return (__simil_UxU_ObjFull2__(UserList,K,Y,PATH,True))
 
 
 def __simil_UxU_Obj__(User_I,User_J):

@@ -59,7 +59,30 @@ def __getMatrixCF_ITEM__(PATH,X):
 def __listaItemEliminati__(ItemList,N):
     list = []
     for i in ItemList:
-        if (i.rw_count <= N):
+        if (i.rw_count < N):
+            list.append(i.item_id)
+
+    return list
+
+
+def __getMatrixCF_ITEM2__(PATH,X):
+    Item = [Itm(i) for i in range(X)]
+
+    with open(PATH+'dataTraining2', 'r') as read1:
+        for line in csv.reader(read1, dialect="excel"):
+            User_id = int(line[0])
+            for i in ast.literal_eval(line[2]):
+                Item[int(i[1])].addUsrRw(i[0],User_id,i[2])
+    read1.close()
+
+    for j in Item:
+        j.average()
+    return Item
+
+def __listaItemEliminati__(ItemList,N):
+    list = []
+    for i in ItemList:
+        if (i.rw_count < N):
             list.append(i.item_id)
 
     return list
@@ -75,24 +98,34 @@ def __listaItemEliminati__(ItemList,N):
 #     read1.close()
 #     return Item
 
-def stampaItemCount(ItemList,PATH):
+def stampaItemCount(ItemList):
     res = []
     for i in ItemList:
         res.append(i.rw_count)
     res2 = []
-    for i in res:
-        res2.append((res.count(i),i))
+    #for i in res:
+    #    res2.append((res.count(i),i))
 
-    res3 = set(res2)
-    res4 = list(res3)
-    res4.sort(None,None,True)
+    for i in range(0,1682):
+        counter = 0
+        for j in res:
+            if i == j:
+                counter += 1
+        if counter != 0:
+            res2.append((counter, i))
 
-    res5 = []
-    for i in res4:
-        res5.append((i[1],i[0]))
+    #print res2
+
+    #res3 = set(res2)
+    #res4 = list(res3)
+    #res4.sort(None,None,True)
+
+    #res5 = []
+    #for i in res4:
+    #    res5.append((i[1],i[0]))
 
     stringa = ' '
-    for i in res5:
+    for i in res2:
         stringa += str(i)+ ' '
 
     print res
