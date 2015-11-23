@@ -18,7 +18,7 @@ def __getK_Simil__(SimilMatrix, ID, k):
     return listres
 
 
-def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
+def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_3=3):
     with open (PATH+'UsagePredictionUxU','w') as URP:
         wr1 = csv.writer(URP, dialect='excel')
         resTP = 0
@@ -30,14 +30,6 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
             temp = []
             temp2 = []
             res = []
-            res2 = []
-            #Simil_id = __getK_Simil__(SimilMatrix,UserTest[UT].usr_id,K)
-            Simil_id = []
-
-            #for i in heapq.nlargest(K_1,SimilMatrix[UT]):
-                #Simil_id.append(i[1])
-
-            #Simil_id = heapq.nlargest(K_1,SimilMatrix[UT])
             Simil_id = SimilMatrix[UT]
             Simil_id_Lista = []
 
@@ -56,68 +48,66 @@ def __recSystemObjUxU__(UserList,UserTest,SimilMatrix,PATH,K_1=1,K_2=5,K_3=3):
                 temp += temp1
             #------------------------#
 
+
+            #Calcolo della frequenza con cui si ripetono gli oggetti raccomandati dai vicini
             for j in temp:
                 temp2.append(j[1])
             for l in temp2:
                 res.append((temp2.count(l),l))
             res = Set(res)
 
-            #CONFRONTO CON IL TRAINING SET
-            #confronto = UserList[UT].extractItem()
-            #for boh in res:
-            #    if boh[1] not in confronto:
-            #        res2.append(boh)
-
+            #Estrazione dei K_3 più frequenti
             res = heapq.nlargest(K_3,res)
 
+            #Estrazione dei soli id degli oggetti raccomandati
             racommendedList = []
             for i in res:
                 racommendedList.append(i[1])
 
-            #prova1 = UserTest[UT].usr_rw#----------------------------#
-
+            #Estrazione dei K_3 oggetti nel testset con votazione >= 4
             userTestList = __estraiItemTEST__(K_3,UserTest[UT].usr_rw)
 
+            #confronto tra dati nel testset e raccomandazioni
             TP = 0
             for rl in userTestList:
                 if rl[0] in racommendedList:
                     TP +=1
 
+            #dati per l'output "verboso" circa le rw utilizzate per ogni utente nel vicinato
             recListPrint = []
             for rl in racommendedList:
                 for i in UserTest[UT].usr_rw:
                     if rl == i[1]:
                         recListPrint.append((rl,i[0]))
 
-
+            #dati necessari al calcolo della Precision, vengono calcolati gli oggetti esclusi perché contenenti valutazioni troppo
+            #basse nel testset e viene segnato il numero di raccomandazioni che (a causa di un vicinato troppo scarno) non sono potute
+            #essere fatte
             if userTestList[0] == 'voti troppo pochi o bassi':
                 TEST_SET_NON_OK+=1
             elif len(racommendedList) < K_3:
                 REC_LIST_EMPTY += (K_3 - len(racommendedList))
                 test.append(UT)
 
-                #prova = UserTest[UT].usr_rw
-                #wr1.writerow([UserTest[UT].usr_id,prova,prova1,userTestList, racommendedList])
-
             resTP += TP
-            #wr1.writerow([UserTest[UT].usr_id,'Vicinato = ',Simil_id,'TP = '+str(TP),userTestList, racommendedList])
+
             URP.write(str(UserTest[UT].usr_id) + ' Vicinato = ' + str(Simil_id) + ' TP = ' +str(TP) + str(userTestList) + str(recListPrint) + '\n')
             URP.write('Vicinato esteso ' + str(Simil_id_Lista) + '\n')
             URP.write('\n')
 
+        precision = (resTP*100)/float(((len(UserList)-TEST_SET_NON_OK)*K_3)-REC_LIST_EMPTY)
+
         print 'TP = ' +str(resTP)
         print 'Righe con test set non ok = '+ str(TEST_SET_NON_OK)
         print 'Raccomandazioni in meno  = ' + str(REC_LIST_EMPTY)
-        #print test
-        precision = (resTP*100)/float(((len(UserList)-TEST_SET_NON_OK)*K_3)-REC_LIST_EMPTY)
-        print precision
+        print 'Raccomandazioni in meno  = ' + str(precision)
 
-        wr1.writerow(['TP = ' +str(resTP) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3)])
+        wr1.writerow(['TP = ' +str(resTP) + ' precision = '+ str(precision)+ 'K_3 = '+str(K_3)])
 
         URP.close()
 
 
-    return'TP = ' +str(resTP) + ' Precision = '+ str(precision) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+' K_1 = '+str(K_1),'K_2 = '+str(K_2),'K_3 = '+str(K_3), ' REC_EMPTY =' + str(REC_LIST_EMPTY)
+    return'TP = ' +str(resTP) + ' Precision = '+ str(precision) + ' Righe dataset scartate = '+ str(TEST_SET_NON_OK)+ ' K_3 = '+str(K_3), ' REC_EMPTY =' + str(REC_LIST_EMPTY)
     #return str(TEST_SET_NON_OK),str(resTP),str(K_1),str(K_2),str(K_3)
 
 
@@ -236,6 +226,9 @@ def ____recSystemObjUxUNextNeighbour__(UserList,UserTest,SimilMatrix,PATH,K_1=1,
 
 
 def __estraiItemTEST__(K_3,Lista_RW):
+    #Estrae almeno K_3 item dalla lista delle rw se esistono almeno K_3 oggetti con voto >= 4,
+    #Se sono men0o restituisce una lista con un solo campo contenente un messaggio di warning
+    #Se ci sono più di K_3 elementi con votazione uguale a 5 o 4 vengono selezionati tutte le recensioni con quella votazione
     counter = 0
     res = []
     Lista_RW.sort(None,None,True)

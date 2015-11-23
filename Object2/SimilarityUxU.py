@@ -49,7 +49,7 @@ def __simil_UxU_ObjFull__(UserList,K,Y,PATH,Written=True):
 
 
 def __simil_UxU_ObjFull2__(UserList,K,Y,PATH,Written=True):
-    #The Pearson correlation similarity User-User
+    #The mod-Pearson correlation similarity User-User
 
     if Written:
         SimilMatrix = []
@@ -114,7 +114,6 @@ def __simil_UxU_Obj__(User_I,User_J):
 
 
 
-
 def pearson(User_I, User_J):
     score_i = []
     score_j = []
@@ -147,13 +146,24 @@ def pearson(User_I, User_J):
         return valoreDaRitornare
 
 
+def sampleStandardDeviation(commonRw, mean_i,mean_j):
+    #Calcolo Standard Deviation
+    sum_i = 0.0
+    sum_j = 0.0
+    if len(commonRw)-1 == 0:
+        return (0.0,0.0)
+    else:
+        for x in commonRw:
+            sum_i += (x[0] - mean_i)**2
+            sum_j += (x[1] - mean_j)**2
+        # return math.sqrt(sumv/(len(x)-1))
 
+        return (math.sqrt(sum_i/(len(commonRw)-1)),math.sqrt(sum_j/(len(commonRw)-1)))
 
 
 
 def __simil_UxU_ObjProva__(User_I,User_J):
-    #l_i = Item_I.extractUser()
-    #l_j = Item_J.extractUser()
+    #Seconda implementazione della similarità di Pearson (meno performante).
     common_user = []#list(set(l_i).intersection(l_j))
     for i in User_I.usr_rw:
        for j in User_J.usr_rw:

@@ -40,6 +40,7 @@ class Usr:
 
 
 def __getMatrixCF__(PATH):
+    #Restituisce la lista di oggetti di tipo Usr contenuti nel data training
     User = []
     with open(PATH+'dataTraining', 'r') as read1:
         for line in csv.reader(read1, dialect="excel"):
@@ -54,6 +55,7 @@ def __getMatrixCF__(PATH):
     return User
 
 def __getMatrixCF_TESTSET__(PATH):
+    #Restituisce la lista di oggetti di tipo Usr contenuti nel dataset
     User = []
     with open(PATH+'dataTest', 'r') as read1:
         for line in csv.reader(read1, dialect="excel"):
@@ -65,6 +67,7 @@ def __getMatrixCF_TESTSET__(PATH):
 
 
 def __WriteMatrixCF__(Prw,path,PATH,X,Y,listaEsclusi=[]):
+    #Scrive i due file contenenti dataset e datatraing sulla base della percentuale Prw di dataset desiderata
     User = [Usr(i) for i in range(Y)]
     UserT = []
     lineCount = 0
@@ -75,8 +78,6 @@ def __WriteMatrixCF__(Prw,path,PATH,X,Y,listaEsclusi=[]):
                 User[(int(line[0])-1)].addItemRw(line[2],int(line[1])-1,line[3])
                 lineCount += 1
     read1.close()
-
-
 
     for U in User:
         Nrw = int(Prw*U.rw_count/100)

@@ -3,6 +3,7 @@ import csv
 import heapq
 import math
 import time
+from Object2.SimilarityUxU import sampleStandardDeviation
 
 __author__ = 'matteo'
 
@@ -119,20 +120,6 @@ def __simil_IxI_ObjFull2__(ItemList,K,X,PATH,Written=True):
         return (__simil_IxI_ObjFull__(ItemList,K,X,PATH,True))
 
 
-
-# calcolo la sample standard deviation
-def sampleStandardDeviation(commonRw, mean_i,mean_j):
-    sum_i = 0.0
-    sum_j = 0.0
-    if len(commonRw)-1 == 0:
-        return (0.0,0.0)
-    else:
-        for x in commonRw:
-            sum_i += (x[0] - mean_i)**2
-            sum_j += (x[1] - mean_j)**2
-        # return math.sqrt(sumv/(len(x)-1))
-
-        return (math.sqrt(sum_i/(len(commonRw)-1)),math.sqrt(sum_j/(len(commonRw)-1)))
 
 
 # calcolo il PCC
