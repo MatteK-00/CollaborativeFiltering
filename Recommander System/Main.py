@@ -28,29 +28,29 @@ def main(nome,nTest=None,K_0=20,K_1=10,K_2=5,K_3=3,K_4=20,dataset='ml-100k',path
 
     print PATH
 
-    # ############ Costruzione dataset SENZA ITEM con MINIMO RW 5 ############
-    # #Seleziono tutto il dataset come data training (dataset = 0)
-    # __WriteMatrixCF__(0,path,PATH,X,Y)
-    # #Estraggo la lista degli oggetti
-    # Item = __getMatrixCF_ITEM__(PATH,X)
-    # #Estraggo la lista degli id degli oggetti con meno di 5 rw
-    # Itemlist = __listaItemEliminati__(Item,5)
-    # #Ricalcolo data-set e training-set sulla base della percentuale K_0, tutti le rw contenenti
-    # # gli oggetti in Itemlist saranno eliminate
-    # __WriteMatrixCF__(K_0,path,PATH,X,Y,Itemlist)
-    #
-    # #Istanzio le liste di utenti per i dati di training e test set
-    # User = __getMatrixCF__(PATH)
-    # UserTest = __getMatrixCF_TESTSET__(PATH)
-    #
-    # #########################################################################
+    ############ Costruzione dataset SENZA ITEM con MINIMO RW 5 ############
+    #Seleziono tutto il dataset come data training (dataset = 0)
+    __WriteMatrixCF__(0,path,PATH,X,Y)
+    #Estraggo la lista degli oggetti
+    Item = __getMatrixCF_ITEM__(PATH,X)
+    #Estraggo la lista degli id degli oggetti con meno di 5 rw
+    Itemlist = __listaItemEliminati__(Item,5)
+    #Ricalcolo data-set e training-set sulla base della percentuale K_0, tutti le rw contenenti
+    # gli oggetti in Itemlist saranno eliminate
+    __WriteMatrixCF__(K_0,path,PATH,X,Y)
+
+    #Istanzio le liste di utenti per i dati di training e test set
+    User2 = __getMatrixCF__(PATH,Itemlist)
+    UserTest2 = __getMatrixCF_TESTSET__(PATH,Itemlist)
+
+
+    #########################################################################
 
 
     ############ Costruzione dataset sulla base del parametro K_0 ############
 
-    __WriteMatrixCF__(K_0,path,PATH,X,Y)
+    #__WriteMatrixCF__(K_0,path,PATH,X,Y)
 
-    Item = __getMatrixCF_ITEM__(PATH,X)
     User = __getMatrixCF__(PATH)
     UserTest = __getMatrixCF_TESTSET__(PATH)
 
@@ -61,7 +61,42 @@ def main(nome,nTest=None,K_0=20,K_1=10,K_2=5,K_3=3,K_4=20,dataset='ml-100k',path
     SimMatrix = __simil_UxU_ObjFull__(User,K_4,Y,PATH,Written=False)
 
     #Lancio il Racommander System sul dataset
-    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,K_3))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,1))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,2))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,3))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,4))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,5))
+
+        #Calcolo/Leggo la matrice di Similarita'
+    SimMatrix = __simil_UxU_ObjFull2__(User,K_4,Y,PATH,Written=False)
+
+    #Lancio il Racommander System sul dataset
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,1))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,2))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,3))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,4))
+    __addNote(path,__recSystemObjUxU__(User,UserTest,SimMatrix,PATH,5))
+
+    print "----------------"
+    #Calcolo/Leggo la matrice di Similarita'
+    SimMatrix = __simil_UxU_ObjFull__(User2,K_4,Y,PATH,Written=False)
+
+    #Lancio il Racommander System sul dataset
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,1))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,2))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,3))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,4))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,5))
+
+        #Calcolo/Leggo la matrice di Similarita'
+    SimMatrix = __simil_UxU_ObjFull2__(User,K_4,Y,PATH,Written=False)
+
+    #Lancio il Racommander System sul dataset
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,1))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,2))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,3))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,4))
+    __addNote(path,__recSystemObjUxU__(User2,UserTest2,SimMatrix,PATH,5))
 
     print "----------------"
 
@@ -75,7 +110,7 @@ if __name__ == "__main__":
     #K_2 = NUMERO DI OGGETTI DA ESTRARRE PER OGNI UTENTE NEL VICINATO
     #K_3 = NUMERO DI RACCOMANDAZIONI FINALE
     #K_4 = DIMENSIONE RIGA MATRICE DI SIMILARITA'
-    main('FullData',1,K_0=20,K_1=4,K_2=4,K_3=2,K_4=0.9 ,dataset='ml-100k')
+    main('FullData',8,K_0=30,K_1=4,K_2=4,K_3=2,K_4=0.9 ,dataset='ml-100k')
 
 
 
